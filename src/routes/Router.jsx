@@ -3,7 +3,7 @@ import { lazy, Suspense } from 'react';
 import KioskLayout from '@layouts/KioskLayout';
 import AdminLayout from '@layouts/AdminLayout';
 
-const ShopPage = lazy(() => import('@pages/shop/ShopPage'));
+const StorePage = lazy(() => import('@pages/store/StorePage'));
 
 const ProductManagePage = lazy(() => import('@pages/admin/ProductManagePage'));
 const PaymentHistoryPage = lazy(() => import('@pages/admin/PaymentHistoryPage'));
@@ -29,7 +29,7 @@ const PageLoader = () => (
 
 export default function AppRouter() {
   const kioskRoutes = [
-    { path: 'shop', element: <ShopPage /> },
+    { path: 'store', element: <StorePage /> },
     { path: '*', element: <NotFoundPage /> },
   ];
 

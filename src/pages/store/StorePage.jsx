@@ -1,12 +1,12 @@
 import GoodsItem from '@components/goods/GoodsItem';
-import styles from './ShopPage.module.css';
+import styles from './StorePage.module.css';
 import { useOutletContext } from 'react-router-dom';
 
 import { useState, useEffect } from 'react';
 import ProductDetailModal from '@components/modal/ProductDetailModal';
 import { getProductsByCategory } from '@api/productApi';
 
-export default function ShopPage() {
+export default function StorePage() {
   const { activeTab, addToCart, categories } = useOutletContext();
 
   const [openDetail, setOpenDetail] = useState(false);

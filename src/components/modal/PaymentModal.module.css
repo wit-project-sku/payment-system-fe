@@ -51,7 +51,7 @@
 .paymentImage {
   width: 500px;
   height: 500px;
-  background-image: url('@assets/images/card.png');
+  background-image: url('@assets/images/card.webp');
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;

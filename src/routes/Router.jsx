@@ -7,8 +7,8 @@ const ShopPage = lazy(() => import('@pages/shop/ShopPage'));
 
 const ProductManagePage = lazy(() => import('@pages/admin/ProductManagePage'));
 const PaymentHistoryPage = lazy(() => import('@pages/admin/PaymentHistoryPage'));
-const IssueTrackerPage = lazy(() => import('@pages/Admin/IssueTrackerPage'));
-const LoginPage = lazy(() => import('@pages/Admin/LoginPage'));
+const IssueTrackerPage = lazy(() => import('@pages/admin/IssueTrackerPage'));
+const LoginPage = lazy(() => import('@pages/admin/LoginPage'));
 
 const NotFoundPage = lazy(() => import('@pages/NotFound/NotFound'));
 

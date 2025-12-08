@@ -1,12 +1,17 @@
 import Modal from '@commons/Modal';
 import styles from './PaymentModal.module.css';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { approvePayment } from '@api/payment';
 
 export default function PaymentModal({ items, onBack, onTimeout, onComplete, onFail }) {
   const totalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0) + 3000;
 
+  const calledRef = useRef(false);
+
   useEffect(() => {
+    if (calledRef.current) return;
+    calledRef.current = true;
+
     const phoneStored = localStorage.getItem('user-phone');
     const imageStored = localStorage.getItem('image-url');
 

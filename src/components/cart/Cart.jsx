@@ -148,7 +148,7 @@ export default function Cart({ items, onRemove, onIncrease, onDecrease }) {
       {showTimeout && (
         <FailModal
           type='timeout'
-          amount={totalPrice}
+          amount={totalPrice + 3000}
           onClose={() => setShowTimeout(false)}
           onRetry={() => {
             setShowTimeout(false);
@@ -160,7 +160,7 @@ export default function Cart({ items, onRemove, onIncrease, onDecrease }) {
       {failType && (
         <FailModal
           type={failType}
-          amount={totalPrice}
+          amount={totalPrice + 3000}
           onClose={() => setFailType(null)}
           onRetry={() => {
             setFailType(null);

@@ -36,7 +36,7 @@ export default function PaymentModal({ items, onBack, onTimeout, onComplete, onF
         productId: item.id,
         quantity: item.quantity,
       })),
-      totalAmount: totalPrice + 3000,
+      totalAmount: totalPrice,
       phoneNumber,
       inst: '00',
       imageUrl,

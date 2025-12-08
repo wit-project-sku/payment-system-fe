@@ -34,6 +34,9 @@ export default function ProductDetailModal({ item, onClose, onAdd }) {
           <div className={styles.modalSubtitle}>
             {detail?.categoryName} &gt; {detail?.name}
           </div>
+          <div className={styles.closeButton} onClick={onClose}>
+            ×
+          </div>
         </div>
 
         <div className={styles.imageWrapper}>

@@ -46,6 +46,20 @@
   color: #000000;
 }
 
+.closeButton {
+  position: absolute;
+  top: 60px;
+  right: 70px;
+  font-size: 70px;
+  font-weight: 400;
+  color: #6b6b6b;
+  cursor: pointer;
+  user-select: none;
+}
+.closeButton:hover {
+  opacity: 0.6;
+}
+
 .modalSubtitle {
   font-size: 40px;
   color: #5e5e5e;

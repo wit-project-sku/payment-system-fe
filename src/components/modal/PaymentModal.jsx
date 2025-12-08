@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { approvePayment } from '@api/payment';
 
 export default function PaymentModal({ items, onBack, onTimeout, onComplete, onFail }) {
-  const totalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const totalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0) + 3000;
 
   useEffect(() => {
     const phoneStored = localStorage.getItem('user-phone');
@@ -87,7 +87,7 @@ export default function PaymentModal({ items, onBack, onTimeout, onComplete, onF
 
       <div className={styles.amountBox}>
         <span className={styles.amountLabel}>결제 금액</span>
-        <span className={styles.amountValue}>{totalPrice.toLocaleString() + 3000}원</span>
+        <span className={styles.amountValue}>{totalPrice.toLocaleString()}원</span>
       </div>
 
       <div className={styles.paymentImage}></div>

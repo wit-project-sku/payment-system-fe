@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
 import KioskLayout from '@layouts/KioskLayout';
 import AdminLayout from '@layouts/AdminLayout';
@@ -35,26 +35,79 @@ const PageLoader = () => (
   </div>
 );
 
+function AddressGuard({ children }) {
+  const location = useLocation();
+  const allowed = location.state && location.state.fromOption === true;
+  return allowed ? children : <Navigate to='/mobile' replace />;
+}
+
+function AdminGuard({ children }) {
+  const isAdmin = localStorage.getItem('admin-auth') === 'true';
+  return isAdmin ? children : <Navigate to='/admin/login' replace />;
+}
+
 export default function AppRouter() {
   const kioskRoutes = [
     { path: 'store', element: <StorePage /> },
-    { path: '*', element: <NotFoundPage /> },
+    { path: '*', element: <Navigate to='/mobile' replace /> },
   ];
 
   const adminRoutes = [
-    { path: 'products', element: <ProductManagePage /> },
-    { path: 'payments', element: <PaymentHistoryPage /> },
-    { path: 'issues', element: <IssueTrackerPage /> },
+    {
+      path: 'products',
+      element: (
+        <AdminGuard>
+          <ProductManagePage />
+        </AdminGuard>
+      ),
+    },
+    {
+      path: 'payments',
+      element: (
+        <AdminGuard>
+          <PaymentHistoryPage />
+        </AdminGuard>
+      ),
+    },
+    {
+      path: 'issues',
+      element: (
+        <AdminGuard>
+          <IssueTrackerPage />
+        </AdminGuard>
+      ),
+    },
     { path: 'login', element: <LoginPage /> },
-    { path: '*', element: <NotFoundPage /> },
+    { path: '*', element: <Navigate to='/mobile' replace /> },
   ];
 
   const mobileRoutes = [
     { path: '', element: <MobileMainPage /> },
-    { path: 'option', element: <OptionPage /> },
+    {
+      path: 'option',
+      element: (
+        <AddressGuard>
+          <OptionPage />
+        </AddressGuard>
+      ),
+    },
     { path: 'search', element: <SearchPage /> },
-    { path: 'address', element: <AddressPage /> },
-    { path: 'delivery', element: <DeliveryPage /> },
+    {
+      path: 'address',
+      element: (
+        <AddressGuard>
+          <AddressPage />
+        </AddressGuard>
+      ),
+    },
+    {
+      path: 'delivery',
+      element: (
+        <AddressGuard>
+          <DeliveryPage />
+        </AddressGuard>
+      ),
+    },
     { path: 'refund', element: <RefundPage /> },
     { path: '*', element: <NotFoundPage /> },
   ];
@@ -63,7 +116,7 @@ export default function AppRouter() {
     <Router>
       <Suspense fallback={<PageLoader />}>
         <Routes>
-          <Route path='/' element={<Navigate to='/kiosk/store' replace />} />
+          <Route path='/' element={<Navigate to='/mobile' replace />} />
           <Route path='/kiosk/*' element={<KioskLayout />}>
             {kioskRoutes.map(({ path, element }) => (
               <Route key={path} path={path} element={element} />
@@ -81,7 +134,7 @@ export default function AppRouter() {
               <Route key={path} path={path} element={element} />
             ))}
           </Route>
-          <Route path='*' element={<NotFoundPage />} />
+          <Route path='*' element={<Navigate to='/mobile' replace />} />
         </Routes>
       </Suspense>
     </Router>

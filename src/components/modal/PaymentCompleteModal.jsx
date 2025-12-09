@@ -33,7 +33,7 @@ export default function PaymentCompleteModal({ onClose }) {
       </div>
 
       <div className={styles.qrContainer}>
-        <QRCode value='https://witteria.com/mobile/search' size={500} />
+        <QRCode value='https://unijuni.store/mobile' size={500} />
       </div>
 
       <div className={styles.linkBox}>

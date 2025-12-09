@@ -1,6 +1,6 @@
 import GoodsItem from '@components/goods/GoodsItem';
 import styles from './StorePage.module.css';
-import { useOutletContext } from 'react-router-dom';
+import { useOutletContext, useSearchParams, useNavigate } from 'react-router-dom';
 
 import { useState, useEffect } from 'react';
 import ProductDetailModal from '@components/modal/ProductDetailModal';
@@ -13,6 +13,17 @@ export default function StorePage() {
   const [selectedItem, setSelectedItem] = useState(null);
   const [products, setProducts] = useState([]);
   const kioskId = 1;
+
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const imageUrl = searchParams.get('imageUrl');
+    if (imageUrl) {
+      localStorage.setItem('product-image-url', imageUrl);
+      navigate('/kiosk/store', { replace: true });
+    }
+  }, [searchParams, navigate]);
 
   useEffect(() => {
     if (!categories || !categories.length) return;

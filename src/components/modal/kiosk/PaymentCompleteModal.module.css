@@ -22,6 +22,12 @@
 .subtitle {
   font-size: 40px;
   color: #666;
+  margin-bottom: 16px;
+}
+
+.subtitleFollow {
+  font-size: 40px;
+  color: #666;
   margin-bottom: 60px;
 }
 

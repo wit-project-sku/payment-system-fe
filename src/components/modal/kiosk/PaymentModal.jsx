@@ -2,61 +2,98 @@ import Modal from '@commons/KioskModal';
 import styles from './PaymentModal.module.css';
 import { useEffect, useState, useRef } from 'react';
 import { approvePayment } from '@api/paymentApi';
+import { useUserStore } from '@hooks/useUserStore';
+import { interpretApproveResponse, interpretApproveAxiosError } from '@/utils/paymentApproveOutcome';
 
-export default function PaymentModal({ items, onBack, onTimeout, onComplete, onFail }) {
+const PAYMENT_SUBMIT_PREFIX = 'payment-fe:submit:';
+
+export default function PaymentModal({ merchantUid, items, onBack, onTimeout, onComplete, onFail }) {
+  const itemsRef = useRef(items);
+  itemsRef.current = items;
+
   const totalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0) + 3000;
 
-  const calledRef = useRef(false);
+  const onCompleteRef = useRef(onComplete);
+  const onFailRef = useRef(onFail);
 
   useEffect(() => {
-    if (calledRef.current) return;
-    calledRef.current = true;
+    onCompleteRef.current = onComplete;
+  }, [onComplete]);
 
-    const phoneStored = localStorage.getItem('user-phone');
-    const imageStored = localStorage.getItem('image-url');
+  useEffect(() => {
+    onFailRef.current = onFail;
+  }, [onFail]);
 
-    let phoneNumber = '';
-    let imageUrl = '';
-
-    if (phoneStored) {
-      try {
-        const parsed = JSON.parse(phoneStored).state || {};
-        phoneNumber = parsed.phone || '';
-      } catch (err) {
-        console.error('전화번호 파싱 실패:', err);
-      }
+  useEffect(() => {
+    if (!merchantUid?.trim()) {
+      onFailRef.current?.('validation', '주문 번호가 없습니다. 처음부터 다시 시도해 주세요.');
+      return;
     }
 
-    if (imageStored) {
-      imageUrl = imageStored;
+    const dedupeKey = `${PAYMENT_SUBMIT_PREFIX}${merchantUid}`;
+    if (sessionStorage.getItem(dedupeKey)) {
+      return;
     }
+    sessionStorage.setItem(dedupeKey, '1');
+
+    const phoneNumber = useUserStore.getState().phone ?? '';
+    if (!phoneNumber.trim()) {
+      sessionStorage.removeItem(dedupeKey);
+      onFailRef.current?.('validation', '전화번호가 필요합니다.');
+      return;
+    }
+
+    const snapshotItems = itemsRef.current;
+
+    const lineItems = snapshotItems
+      .filter((item) => item.id != null)
+      .map((item) => ({
+        productId: Number(item.id),
+        quantity: item.quantity,
+      }));
+
+    if (lineItems.length === 0) {
+      sessionStorage.removeItem(dedupeKey);
+      onFailRef.current?.('validation', '결제할 상품 정보가 없습니다.');
+      return;
+    }
+
+    const computedTotal =
+      snapshotItems.reduce((sum, item) => sum + item.price * item.quantity, 0) + 3000;
 
     const payload = {
-      items: items.map((item) => ({
-        productId: item.id,
-        quantity: item.quantity,
-      })),
-      totalAmount: totalPrice,
+      merchantUid,
+      items: lineItems,
+      totalAmount: computedTotal,
       phoneNumber,
-      imageUrl,
-      delivery: true,
     };
 
-    approvePayment(payload)
-      .then((res) => {
-        const success = res?.success === true;
+    let paymentPromise;
+    try {
+      paymentPromise = approvePayment(payload);
+    } catch (err) {
+      sessionStorage.removeItem(dedupeKey);
+      console.error('결제 요청 본문 검증 실패:', err);
+      const msg = err instanceof Error ? err.message : String(err);
+      onFailRef.current?.('validation', msg || '요청 정보가 올바르지 않습니다.');
+      return;
+    }
 
-        if (success) {
-          if (typeof onComplete === 'function') onComplete();
+    paymentPromise
+      .then((res) => {
+        const outcome = interpretApproveResponse(res);
+        if (outcome.ok) {
+          onCompleteRef.current?.();
         } else {
-          if (typeof onFail === 'function') onFail('network');
+          onFailRef.current?.('payment', outcome.message);
         }
       })
       .catch((err) => {
         console.error('결제 승인 API 호출 실패:', err);
-        if (typeof onFail === 'function') onFail('network');
+        const { kind, message } = interpretApproveAxiosError(err);
+        onFailRef.current?.(kind, message);
       });
-  }, []);
+  }, [merchantUid]);
 
   const [progress, setProgress] = useState(0);
   const [secondsLeft, setSecondsLeft] = useState(60);

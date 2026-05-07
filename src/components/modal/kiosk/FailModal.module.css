@@ -21,6 +21,15 @@
   margin-bottom: 70px;
 }
 
+.detail {
+  font-size: 38px;
+  color: #6b5344;
+  margin: -40px auto 40px;
+  max-width: 950px;
+  line-height: 1.35;
+  word-break: keep-all;
+}
+
 .amountBox {
   background: #fff8ef;
   padding: 40px 0;

@@ -67,7 +67,8 @@ export default function PaymentCompleteModal({ onClose }) {
   return (
     <Modal onClose={handleClose}>
       <h2 className={styles.title}>결제 완료</h2>
-      <p className={styles.subtitle}>문자 메시지가 발송되었습니다.</p>
+      <p className={styles.subtitle}>결제가 정상적으로 처리되었습니다.</p>
+      <p className={styles.subtitleFollow}>문자 메시지가 발송되었습니다.</p>
 
       <div className={styles.noticeBox}>
         📱 <b>{phone}</b> 로 링크가 전송되었습니다.

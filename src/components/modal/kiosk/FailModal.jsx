@@ -4,7 +4,7 @@ import clockImg from '@assets/images/clock.png';
 import warnImg from '@assets/images/warn.png';
 import failImg from '@assets/images/warn.png';
 
-export default function FailModal({ type, amount, onClose, onRetry }) {
+export default function FailModal({ type, amount, detail, onClose, onRetry }) {
   const config = {
     lack: {
       title: '잔액이 부족합니다.',
@@ -27,9 +27,24 @@ export default function FailModal({ type, amount, onClose, onRetry }) {
       buttonText: '다시 시도',
       buttonAction: onRetry,
     },
+    payment: {
+      title: '결제에 실패했습니다.',
+      desc: '카드 승인 거절, 한도 초과 등으로 결제를 마무리하지 못했습니다.',
+      icon: warnImg,
+      buttonText: '다시 시도',
+      buttonAction: onRetry,
+    },
+    validation: {
+      title: '결제 정보를 확인해 주세요.',
+      desc: '필요한 정보가 부족하거나 올바르지 않습니다.',
+      icon: warnImg,
+      buttonText: '확인',
+      buttonAction: onClose,
+    },
   };
 
-  const { title, desc, icon, buttonText, buttonAction } = config[type];
+  const entry = config[type] ?? config.network;
+  const { title, desc, icon, buttonText, buttonAction } = entry;
 
   return (
     <Modal onClose={onClose}>
@@ -37,14 +52,16 @@ export default function FailModal({ type, amount, onClose, onRetry }) {
         <h2 className={styles.title}>{title}</h2>
         <p className={styles.desc}>{desc}</p>
 
+        {detail ? <p className={styles.detail}>{detail}</p> : null}
+
         <div className={styles.amountBox}>
           <span className={styles.amountLabel}>결제 금액</span>
           <span className={styles.amountValue}>{amount.toLocaleString()}원</span>
         </div>
 
-        <img src={icon} alt='icon' className={styles.icon} />
+        <img src={icon} alt='' className={styles.icon} />
 
-        <button className={styles.actionButton} onClick={buttonAction}>
+        <button type='button' className={styles.actionButton} onClick={buttonAction}>
           {buttonText}
         </button>
       </div>

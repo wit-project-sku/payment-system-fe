@@ -8,6 +8,7 @@ import PhoneInputModal from '@modals/kiosk/PhoneInputModal';
 import ReturnWarningModal from '@modals/kiosk/WarningModal';
 import PaymentCompleteModal from '@modals/kiosk/PaymentCompleteModal';
 import FailModal from '@modals/kiosk/FailModal';
+import { generateMerchantUid } from '@/utils/merchantUid';
 
 export default function Cart({ items, onRemove, onIncrease, onDecrease }) {
   const [showNotice, setShowNotice] = useState(false);
@@ -18,11 +19,14 @@ export default function Cart({ items, onRemove, onIncrease, onDecrease }) {
   const [showComplete, setShowComplete] = useState(false);
   const [showTimeout, setShowTimeout] = useState(false);
 
-  // ★ 추가: network/lack 실패 모달 표시용
+  // ★ 추가: network/lack/payment/validation 실패 모달 표시용
   const [failType, setFailType] = useState(null);
+  const [failMessage, setFailMessage] = useState('');
 
   const [phone, setPhone] = useState(null);
-  const totalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const [merchantUid, setMerchantUid] = useState('');
+  const itemsTotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const grandTotal = itemsTotal + 3000;
 
   return (
     <>
@@ -54,7 +58,7 @@ export default function Cart({ items, onRemove, onIncrease, onDecrease }) {
 
           <div className={styles.totalLabel}>총 결제 금액</div>
 
-          <div className={styles.totalPrice}>{totalPrice.toLocaleString()}원</div>
+          <div className={styles.totalPrice}>{grandTotal.toLocaleString()}원</div>
 
           <button
             className={styles.payButton}
@@ -116,6 +120,7 @@ export default function Cart({ items, onRemove, onIncrease, onDecrease }) {
           onConfirm={() => {
             setShowReturnWarning(false);
             setShowPhone(false);
+            setMerchantUid(generateMerchantUid());
             setShowPayment(true);
           }}
         />
@@ -123,6 +128,7 @@ export default function Cart({ items, onRemove, onIncrease, onDecrease }) {
 
       {showPayment && (
         <PaymentModal
+          merchantUid={merchantUid}
           items={items}
           onBack={() => {
             setShowPayment(false);
@@ -136,9 +142,10 @@ export default function Cart({ items, onRemove, onIncrease, onDecrease }) {
             setShowPayment(false);
             setShowComplete(true);
           }}
-          onFail={(type) => {
+          onFail={(type, message) => {
             setShowPayment(false);
             setFailType(type);
+            setFailMessage(typeof message === 'string' ? message : '');
           }}
         />
       )}
@@ -148,10 +155,11 @@ export default function Cart({ items, onRemove, onIncrease, onDecrease }) {
       {showTimeout && (
         <FailModal
           type='timeout'
-          amount={totalPrice + 3000}
+          amount={grandTotal}
           onClose={() => setShowTimeout(false)}
           onRetry={() => {
             setShowTimeout(false);
+            setMerchantUid(generateMerchantUid());
             setShowPayment(true);
           }}
         />
@@ -160,10 +168,16 @@ export default function Cart({ items, onRemove, onIncrease, onDecrease }) {
       {failType && (
         <FailModal
           type={failType}
-          amount={totalPrice + 3000}
-          onClose={() => setFailType(null)}
+          amount={grandTotal}
+          detail={failMessage || undefined}
+          onClose={() => {
+            setFailType(null);
+            setFailMessage('');
+          }}
           onRetry={() => {
             setFailType(null);
+            setFailMessage('');
+            setMerchantUid(generateMerchantUid());
             setShowPayment(true);
           }}
         />

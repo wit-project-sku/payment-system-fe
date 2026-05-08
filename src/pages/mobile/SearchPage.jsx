@@ -102,6 +102,8 @@ export default function SearchPage() {
 
             if (Array.isArray(data) && data.length > 0) {
               const target = mode === 'order' ? '/mobile/option' : '/mobile/delivery';
+              console.log(data,'data');
+              
               navigate(target, {
                 state: {
                   orders: data,

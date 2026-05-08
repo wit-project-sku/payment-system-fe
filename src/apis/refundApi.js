@@ -16,7 +16,7 @@ const buildRefundMultipart = (request, images = []) => {
   return formData;
 };
 
-// 환불 신청 생성 (POST /api/refunds)
+// 환불 신청 생성 (POST …/api/refunds; 경로는 axios 인터셉터에서 /api 접두사)
 export const createRefund = async (refundRequest, images = []) => {
   try {
     const formData = buildRefundMultipart(refundRequest, images);

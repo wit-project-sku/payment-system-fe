@@ -1,6 +1,6 @@
 import { APIService } from './axios';
 
-/** Nest payment-agent: POST /api/payments (ApproveRequestDto). */
+/** Nest payment-agent: POST `/api/payments` (ApproveRequestDto). Path kept explicit so 승인 요청은 항상 `/api` 아래로 갑니다. */
 const PAYMENTS_APPROVE_PATH = '/api/payments';
 
 /**

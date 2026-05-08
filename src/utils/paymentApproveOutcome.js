@@ -1,5 +1,5 @@
 /**
- * Helpers for interpreting POST /api/payments responses and axios errors.
+ * Helpers for interpreting POST …/api/payments responses and axios errors.
  */
 
 function extractServerMessage(obj) {

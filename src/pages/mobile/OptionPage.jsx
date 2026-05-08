@@ -1,94 +1,80 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import styles from './OptionPage.module.css';
 import left from '@assets/images/left.png';
 
-const PHONE_CASE_OPTIONS = [
-  'iPhone 17',
-  'iPhone 17 Air',
-  'iPhone 17 Pro',
-  'iPhone 17 Pro Max',
-  'iPhone 16',
-  'iPhone 16 Plus',
-  'iPhone 16 Pro',
-  'iPhone 16 Pro Max',
-  'iPhone 15',
-  'iPhone 15 Plus',
-  'iPhone 15 Pro',
-  'iPhone 15 Pro Max',
-  'iPhone 14',
-  'iPhone 14 Plus',
-  'iPhone 14 Pro',
-  'iPhone 14 Pro Max',
-  'iPhone 13',
-  'iPhone 13 Pro',
-  'iPhone 13 Pro Max',
-  'iPhone 12',
-  'iPhone 12 Pro',
-  'iPhone 12 Pro Max',
-  '[SAMSUNG] S25',
-  '[SAMSUNG] S25+',
-  '[SAMSUNG] S25 ULTRA',
-  '[SAMSUNG] S24',
-  '[SAMSUNG] S24+',
-  '[SAMSUNG] S24+ ULTRA',
-  '[SAMSUNG] S23',
-  '[SAMSUNG] S23+',
-  '[SAMSUNG] S23+ ULTRA',
-  '[SAMSUNG] Z FLIP 7',
-  '[SAMSUNG] Z FLIP 6',
-  '[SAMSUNG] Z FLIP 5',
-  '[SAMSUNG] Z FLIP 4',
-  '[SAMSUNG] Z FLIP 3',
-];
-
 export default function OptionPage() {
+  // 폰케이스는 상품별로 기종 옵션을 선택해야 하므로, item.id 기준으로 옵션을 저장합니다.
   const [selectedOptions, setSelectedOptions] = useState({});
   const navigate = useNavigate();
   const location = useLocation();
-  const orders = useMemo(() => {
-    const raw = location.state?.orders;
-    return Array.isArray(raw) ? raw : [];
-  }, [location.state]);
+  const orders = location.state?.orders || [];
 
-  useEffect(() => {
-    if (!orders.length) {
-      navigate('/mobile/search?type=order', { replace: true });
-    }
-  }, [orders, navigate]);
+  const items = orders.flatMap((order) =>
+    order.productListResponses.flatMap((product, index) => {
+      const baseItem = {
+        id: `${order.paymentId}-${product.productId}-${index}`,
+        name: product.productName || '상품명 없음',
+        image: product.productImageUrl || '',
+        category: product.category,
+        options:
+          product.category === '폰케이스'
+            ? [
+                'iPhone 17',
+                'iPhone 17 Air',
+                'iPhone 17 Pro',
+                'iPhone 17 Pro Max',
+                'iPhone 16',
+                'iPhone 16 Plus',
+                'iPhone 16 Pro',
+                'iPhone 16 Pro Max',
+                'iPhone 15',
+                'iPhone 15 Plus',
+                'iPhone 15 Pro',
+                'iPhone 15 Pro Max',
+                'iPhone 14',
+                'iPhone 14 Plus',
+                'iPhone 14 Pro',
+                'iPhone 14 Pro Max',
+                'iPhone 13',
+                'iPhone 13 Pro',
+                'iPhone 13 Pro Max',
+                'iPhone 12',
+                'iPhone 12 Pro',
+                'iPhone 12 Pro Max',
+                '[SAMSUNG] S25',
+                '[SAMSUNG] S25+',
+                '[SAMSUNG] S25 ULTRA',
+                '[SAMSUNG] S24',
+                '[SAMSUNG] S24+',
+                '[SAMSUNG] S24+ ULTRA',
+                '[SAMSUNG] S23',
+                '[SAMSUNG] S23+',
+                '[SAMSUNG] S23+ ULTRA',
+                '[SAMSUNG] Z FLIP 7',
+                '[SAMSUNG] Z FLIP 6',
+                '[SAMSUNG] Z FLIP 5',
+                '[SAMSUNG] Z FLIP 4',
+                '[SAMSUNG] Z FLIP 3',
+              ]
+            : [],
+      };
 
-  const items = useMemo(
-    () =>
-      orders.flatMap((order) =>
-        (order.productListResponses || []).flatMap((product, index) => {
-          const deliveryId = order.deliveryId;
-          const baseItem = {
-            id: `${deliveryId}-${product.productId}-${index}`,
-            deliveryId,
-            productId: product.productId,
-            name: product.productName || '상품명 없음',
-            image: product.productImageUrl || '',
-            category: product.category,
-            options: product.category === '폰케이스' ? PHONE_CASE_OPTIONS : [],
-          };
+      if (product.category === '핸드폰' && product.productQuantity > 1) {
+        return Array.from({ length: product.productQuantity }, (_, i) => ({
+          ...baseItem,
+          id: `${baseItem.id}-${i}`,
+          qty: 1,
+        }));
+      }
 
-          if (product.category === '핸드폰' && product.productQuantity > 1) {
-            return Array.from({ length: product.productQuantity }, (_, i) => ({
-              ...baseItem,
-              id: `${baseItem.id}-u${i}`,
-              qty: 1,
-            }));
-          }
-
-          return [
-            {
-              ...baseItem,
-              qty: product.productQuantity,
-            },
-          ];
-        }),
-      ),
-    [orders],
+      return [
+        {
+          ...baseItem,
+          qty: product.productQuantity,
+        },
+      ];
+    }),
   );
 
   const requiresOption = items.some((item) => item.category === '폰케이스');
@@ -100,19 +86,12 @@ export default function OptionPage() {
   const handleNext = () => {
     if (!isNextEnabled) return;
 
-    const optionLineRows = items.map((item) => ({
-      id: item.id,
-      deliveryId: item.deliveryId,
-      productId: item.productId,
-      category: item.category,
-    }));
-
     navigate('/mobile/address', {
       state: {
         ...(location.state ?? {}),
         fromOption: true,
+        // 폰케이스 기종 옵션(상품별)
         selectedOptions,
-        optionLineRows,
       },
     });
   };

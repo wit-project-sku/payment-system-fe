@@ -1,47 +1,17 @@
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import styles from './DeliveryPage.module.css';
 import leftArrow from '@assets/images/leftArrow.png';
 import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { fetchDeliveryByPhone } from '@api/deliveryApi';
-import { extractListPayload } from '@/utils/mobileDelivery';
 
 export default function DeliveryPage() {
   const location = useLocation();
-  const navigate = useNavigate();
   const phoneNumber = location.state?.phoneNumber;
-  const preloadedOrders = location.state?.orders;
 
-  const hasPreload = Array.isArray(preloadedOrders) && preloadedOrders.length > 0;
+  const [deliveries, setDeliveries] = useState([]);
 
-  /** `null`: 아직 전화번호 조회 전 / 중, `배열`: 조회 결과(비어있을 수 있음) */
-  const [remoteList, setRemoteList] = useState(null);
-
-  useEffect(() => {
-    if (!phoneNumber && !hasPreload) {
-      navigate('/mobile/search?type=delivery', { replace: true });
-    }
-  }, [phoneNumber, hasPreload, navigate]);
-
-  useEffect(() => {
-    if (hasPreload || !phoneNumber) return undefined;
-
-    let cancelled = false;
-    (async () => {
-      try {
-        const res = await fetchDeliveryByPhone(phoneNumber);
-        const list = extractListPayload(res);
-        if (!cancelled) setRemoteList(list);
-      } catch {
-        if (!cancelled) setRemoteList([]);
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [phoneNumber, hasPreload]);
-
-  const deliveries = hasPreload ? preloadedOrders : remoteList ?? [];
+  const navigate = useNavigate();
 
   const formatPhoneNumber = (value) => {
     if (!value) return '';
@@ -64,6 +34,19 @@ export default function DeliveryPage() {
         return status;
     }
   };
+
+  useEffect(() => {
+    if (!phoneNumber) return;
+
+    fetchDeliveryByPhone(phoneNumber)
+      .then((res) => {
+        setDeliveries(res.data);
+        console.log(res);
+      })
+      .catch(() => {
+        setDeliveries([]);
+      });
+  }, [phoneNumber]);
 
   return (
     <div className={styles.container}>
@@ -100,8 +83,8 @@ export default function DeliveryPage() {
             </div>
           </div>
 
-          {(delivery.productListResponses || []).map((product, idx) => (
-            <div className={styles.itemRow} key={`${delivery.deliveryId}-${product.productId}-${idx}`}>
+          {delivery.productListResponses.map((product) => (
+            <div className={styles.itemRow} key={product.productId}>
               <span className={styles.itemName}>
                 {product.productName} x {product.productQuantity}
               </span>

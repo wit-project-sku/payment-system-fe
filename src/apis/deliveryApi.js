@@ -1,9 +1,9 @@
 import { APIService } from './axios';
 
 /**
- * Public delivery lookup by phone (`GET /api/deliveries/search`).
+ * `GET /api/deliveries/search` (public). Optional `order` filters by delivery status (e.g. `ORDERED` for mobile order completion).
  * @param {string} phoneNumber
- * @param {{ order?: string }} [query] — optional `order`: delivery status filter (`ORDERED`, etc.) for mobile order-completion flow
+ * @param {{ order?: string }} [query]
  */
 export const fetchDeliveryByPhone = async (phoneNumber, query = {}) => {
   try {

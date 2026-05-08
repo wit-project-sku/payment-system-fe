@@ -1,5 +1,5 @@
 import { APIService } from './axios';
-import { extractApiData } from '@/utils/extractApiData';
+import { extractApiData, normalizeToArray } from '@/utils/extractApiData';
 
 /**
  * GET `/api/products/categories/:categoryId?kioskId=`
@@ -14,7 +14,7 @@ export const getProductsByCategory = async (categoryId, kioskId = 3) => {
       },
     });
     const data = extractApiData(res);
-    return Array.isArray(data) ? data : [];
+    return normalizeToArray(data);
   } catch (err) {
     console.error('상품 조회 실패:', err);
     throw err;

@@ -12,14 +12,19 @@ export default function StorePage() {
   const [openDetail, setOpenDetail] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [products, setProducts] = useState([]);
-  const storedKioskId = localStorage.getItem('kiosk-id');
-  const sanitizedStored = storedKioskId && storedKioskId !== 'null' ? storedKioskId.match(/\d+/)?.[0] : null;
-  const kioskId = sanitizedStored ? Number(sanitizedStored) : 3;
-  const effectiveKioskId = Number.isFinite(kioskId) && kioskId > 0 ? kioskId : 3;
 
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const justNormalizedRef = useRef(false);
+
+  /** URL 정규화 이후 localStorage 기준 — 렌더 시점 값과 어긋나 빈 목록이 나오지 않게 요청 직전에 읽습니다. */
+  const readEffectiveKioskId = () => {
+    const storedKioskId = localStorage.getItem('kiosk-id');
+    const sanitizedStored =
+      storedKioskId && storedKioskId !== 'null' ? storedKioskId.match(/\d+/)?.[0] : null;
+    const kioskId = sanitizedStored ? Number(sanitizedStored) : 3;
+    return Number.isFinite(kioskId) && kioskId > 0 ? kioskId : 3;
+  };
 
   useEffect(() => {
     const rawSearch = window.location.search ?? '';
@@ -36,7 +41,7 @@ export default function StorePage() {
         return;
       }
 
-      localStorage.setItem('kiosk-id', 'null');
+      // kiosk-id를 지우면 기본 kioskId=3으로만 조회되어, 스테이지에서 해당 키오스크에 상품이 없으면 항상 빈 목록이 됩니다.
       localStorage.setItem('image-url', 'null');
 
       return;
@@ -66,7 +71,12 @@ export default function StorePage() {
 
     const fetchProducts = async () => {
       try {
-        const list = await getProductsByCategory(activeCategory.id, effectiveKioskId);
+        const kioskIdForApi = readEffectiveKioskId();
+        const categoryId = Number(activeCategory.id);
+        const list = await getProductsByCategory(
+          Number.isFinite(categoryId) ? categoryId : activeCategory.id,
+          kioskIdForApi,
+        );
         setProducts(Array.isArray(list) ? list : []);
       } catch (err) {
         console.error('상품 조회 실패:', err);
@@ -75,7 +85,7 @@ export default function StorePage() {
     };
 
     fetchProducts();
-  }, [activeTab, categories, effectiveKioskId]);
+  }, [activeTab, categories]);
 
   const handleOpenDetail = (item) => {
     setSelectedItem(item);

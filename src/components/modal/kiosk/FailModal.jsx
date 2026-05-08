@@ -49,10 +49,23 @@ export default function FailModal({ type, amount, detail, onClose, onRetry }) {
   return (
     <Modal onClose={onClose}>
       <div className={styles.modalWrapper}>
+        <div className={styles.errorHero} aria-hidden='true'>
+          <div className={styles.errorCircle}>
+            <svg className={styles.errorMark} viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
+              <path d='M6 6l12 12M18 6L6 18' stroke='currentColor' strokeWidth='2.5' strokeLinecap='round' />
+            </svg>
+          </div>
+        </div>
+
         <h2 className={styles.title}>{title}</h2>
         <p className={styles.desc}>{desc}</p>
 
-        {detail ? <p className={styles.detail}>{detail}</p> : null}
+        {detail ? (
+          <div className={styles.detailCard}>
+            <span className={styles.detailLabel}>상세 안내</span>
+            <p className={styles.detail}>{detail}</p>
+          </div>
+        ) : null}
 
         <div className={styles.amountBox}>
           <span className={styles.amountLabel}>결제 금액</span>

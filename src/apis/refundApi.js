@@ -2,6 +2,41 @@ import { APIService } from './axios';
 
 const REQUEST_PART_NAME = 'request';
 
+/**
+ * @typedef {object} RefundRequestPayload
+ * @property {string} transactionId
+ * @property {string} phoneNumber
+ * @property {string} refundReason
+ * @property {string} description
+ */
+
+/**
+ * @typedef {object} RefundImageItem
+ * @property {number} id
+ * @property {string} imageUrl
+ */
+
+/**
+ * @typedef {object} RefundResponseData
+ * @property {number} id
+ * @property {string} transactionId
+ * @property {string} phoneNumber
+ * @property {string} [receiverName]
+ * @property {string} refundReason
+ * @property {string} description
+ * @property {RefundImageItem[]} images
+ * @property {string} refundStatus
+ */
+
+/**
+ * POST /api/refunds 성공 시 본문 (`BaseResponse<RefundResponseData>`)
+ * @typedef {object} CreateRefundSuccessBody
+ * @property {true} success
+ * @property {number} code
+ * @property {string} message
+ * @property {RefundResponseData} data
+ */
+
 const buildRefundMultipart = (request, images = []) => {
   const formData = new FormData();
 
@@ -16,16 +51,44 @@ const buildRefundMultipart = (request, images = []) => {
   return formData;
 };
 
-// 환불 신청 생성 (POST …/api/refunds; 경로는 axios 인터셉터에서 /api 접두사)
+const multipartConfig = {
+  transformRequest: [
+    (data, headers) => {
+      if (data instanceof FormData && headers) {
+        if (typeof headers.delete === 'function') {
+          headers.delete('Content-Type');
+        } else {
+          delete headers['Content-Type'];
+        }
+      }
+      return data;
+    },
+  ],
+};
+
+/**
+ * 환불 신청 생성 — `POST /api/refunds` (multipart: `request` JSON + `images` files)
+ * @param {RefundRequestPayload} refundRequest
+ * @param {File[]} images
+ * @returns {Promise<CreateRefundSuccessBody>}
+ */
 export const createRefund = async (refundRequest, images = []) => {
   try {
     const formData = buildRefundMultipart(refundRequest, images);
-    const res = await APIService.public.post('/refunds', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
-    return res;
+    /** @type {unknown} */
+    const body = await APIService.public.post('/refunds', formData, multipartConfig);
+
+    if (body == null || typeof body !== 'object' || body.success !== true) {
+      const msg =
+        typeof body === 'object' && body != null && 'message' in body && typeof body.message === 'string'
+          ? body.message
+          : '환불 신청에 실패했습니다.';
+      const err = new Error(msg);
+      err.cause = body;
+      throw err;
+    }
+
+    return /** @type {CreateRefundSuccessBody} */ (body);
   } catch (err) {
     console.error('환불 신청 실패:', err);
     throw err;

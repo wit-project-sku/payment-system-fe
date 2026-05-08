@@ -17,6 +17,8 @@ export default function Cart({ items, onRemove, onIncrease, onDecrease }) {
   const [showReturnWarning, setShowReturnWarning] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
   const [showComplete, setShowComplete] = useState(false);
+  /** @type {{ message: string, code?: number, data?: unknown } | null} */
+  const [paymentSuccessSummary, setPaymentSuccessSummary] = useState(null);
   const [showTimeout, setShowTimeout] = useState(false);
 
   // ★ 추가: network/lack/payment/validation 실패 모달 표시용
@@ -138,8 +140,9 @@ export default function Cart({ items, onRemove, onIncrease, onDecrease }) {
             setShowPayment(false);
             setShowTimeout(true);
           }}
-          onComplete={() => {
+          onComplete={(summary) => {
             setShowPayment(false);
+            setPaymentSuccessSummary(summary ?? null);
             setShowComplete(true);
           }}
           onFail={(type, message) => {
@@ -150,7 +153,15 @@ export default function Cart({ items, onRemove, onIncrease, onDecrease }) {
         />
       )}
 
-      {showComplete && <PaymentCompleteModal onClose={() => setShowComplete(false)} />}
+      {showComplete && (
+        <PaymentCompleteModal
+          summary={paymentSuccessSummary}
+          onClose={() => {
+            setShowComplete(false);
+            setPaymentSuccessSummary(null);
+          }}
+        />
+      )}
 
       {showTimeout && (
         <FailModal

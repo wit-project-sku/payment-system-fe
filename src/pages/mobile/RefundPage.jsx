@@ -1,9 +1,24 @@
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { createRefund } from '@api/refundApi';
 import styles from './RefundPage.module.css';
 import noticeImg from '@assets/images/notice.png';
 import leftImg from '@assets/images/left.png';
 import boxImg from '@assets/images/box.png';
+
+/** 백엔드 RefundReason enum과 동일 */
+const REASON_TO_API = {
+  print: 'PRINT',
+  damage: 'SCRATCH',
+  color: 'COLOR',
+  etc: 'ETC',
+};
+
+function refundStatusLabel(status) {
+  if (status === 'WAITING') return '접수 대기';
+  if (status === 'COMPLETE') return '처리 완료';
+  return status ?? '—';
+}
 
 export default function RefundPage() {
   const navigate = useNavigate();
@@ -19,6 +34,8 @@ export default function RefundPage() {
   const [images, setImages] = useState([]);
 
   const [showTermsModal, setShowTermsModal] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [successResult, setSuccessResult] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -41,12 +58,42 @@ export default function RefundPage() {
     setImages(files);
   };
 
-  const isValid = form.orderNo.trim() && form.phone.trim() && form.reason.trim() && form.detail.trim();
+  const isValid =
+    form.orderNo.trim() &&
+    form.phone.trim() &&
+    form.reason.trim() &&
+    form.detail.trim() &&
+    images.length >= 1 &&
+    images.length <= 3;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!isValid) return;
-    navigate('/mobile/mainpage');
+    if (!isValid || submitting) return;
+
+    const refundReason = REASON_TO_API[form.reason];
+    if (!refundReason) return;
+
+    setSubmitting(true);
+    try {
+      const res = await createRefund(
+        {
+          transactionId: form.orderNo.trim(),
+          phoneNumber: form.phone.trim(),
+          refundReason,
+          description: form.detail.trim(),
+        },
+        images,
+      );
+      setSuccessResult({ message: res.message, data: res.data });
+    } catch (err) {
+      const msg =
+        err?.response?.data?.message ||
+        err?.message ||
+        '신청 처리 중 오류가 발생했습니다.';
+      alert(msg);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -190,9 +237,9 @@ export default function RefundPage() {
           <button
             type='submit'
             className={`${styles.submitButton} ${isValid ? styles.active : ''}`}
-            disabled={!isValid}
+            disabled={!isValid || submitting}
           >
-            신청하기
+            {submitting ? '처리 중…' : '신청하기'}
           </button>
         </form>
 
@@ -282,6 +329,54 @@ export default function RefundPage() {
             </p>
             <button className={styles.termsClose} onClick={() => setShowTermsModal(false)}>
               확인
+            </button>
+          </div>
+        </div>
+      )}
+      {successResult && (
+        <div className={styles.successOverlay} role='dialog' aria-modal='true' aria-labelledby='refund-success-title'>
+          <div className={styles.successCard}>
+            <div className={styles.successIcon} aria-hidden='true'>
+              <svg className={styles.successCheckSvg} viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
+                <path
+                  d='M20 6L9 17l-5-5'
+                  stroke='currentColor'
+                  strokeWidth='2.5'
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                />
+              </svg>
+            </div>
+            <h2 id='refund-success-title' className={styles.successTitle}>
+              신청이 완료되었습니다
+            </h2>
+            <p className={styles.successMessage}>{successResult.message}</p>
+            {successResult.data && (
+              <div className={styles.successDetails}>
+                <div className={styles.successDetailRow}>
+                  <span className={styles.successDetailKey}>주문번호</span>
+                  <span className={styles.successDetailVal}>{successResult.data.transactionId}</span>
+                </div>
+                <div className={styles.successDetailRow}>
+                  <span className={styles.successDetailKey}>접수번호</span>
+                  <span className={styles.successDetailVal}>#{successResult.data.id}</span>
+                </div>
+                <div className={styles.successDetailRow}>
+                  <span className={styles.successDetailKey}>처리 상태</span>
+                  <span className={styles.successDetailVal}>{refundStatusLabel(successResult.data.refundStatus)}</span>
+                </div>
+              </div>
+            )}
+            <p className={styles.successHint}>영업일 기준 1~2일 내 확인 후 안내드립니다.</p>
+            <button
+              type='button'
+              className={styles.successHomeBtn}
+              onClick={() => {
+                setSuccessResult(null);
+                navigate('/mobile');
+              }}
+            >
+              홈으로 이동
             </button>
           </div>
         </div>

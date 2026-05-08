@@ -102,6 +102,10 @@ export default function StorePage() {
     handleCloseDetail();
   };
 
+
+  console.log(products,'products');
+  
+
   const detailModal = openDetail && (
     <ProductDetailModal item={selectedItem} onClose={handleCloseDetail} onAdd={handleAddFromModal} />
   );

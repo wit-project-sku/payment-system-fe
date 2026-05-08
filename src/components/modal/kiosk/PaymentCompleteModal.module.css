@@ -12,11 +12,68 @@
   align-items: center;
 }
 
+.successHero {
+  margin-bottom: 36px;
+}
+
+.successCircle {
+  width: 140px;
+  height: 140px;
+  margin: 0 auto;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #c49a6c 0%, #8b6a47 100%);
+  color: #fffdf9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 12px 32px rgba(139, 106, 71, 0.35);
+}
+
+.successCheck {
+  width: 72px;
+  height: 72px;
+}
+
 .title {
   font-size: 90px;
   font-weight: 500;
   color: #4b3d2a;
-  margin-bottom: 20px;
+  margin-bottom: 28px;
+}
+
+.apiBanner {
+  width: 1100px;
+  background: linear-gradient(180deg, #fffdf9 0%, #faf5ef 100%);
+  border: 2px solid #c9a882;
+  border-radius: 22px;
+  padding: 36px 44px;
+  margin-bottom: 32px;
+  box-sizing: border-box;
+  box-shadow: 0 8px 28px rgba(75, 61, 42, 0.08);
+}
+
+.apiBannerLabel {
+  display: block;
+  font-size: 34px;
+  font-weight: 700;
+  color: #8b6a47;
+  margin-bottom: 16px;
+  letter-spacing: -0.02em;
+}
+
+.apiBannerMessage {
+  font-size: 46px;
+  font-weight: 600;
+  color: #4b3d2a;
+  line-height: 1.35;
+  margin: 0;
+  word-break: keep-all;
+}
+
+.apiBannerMeta {
+  font-size: 30px;
+  color: #8b7355;
+  margin: 16px 0 0;
 }
 
 .subtitle {

@@ -11,8 +11,21 @@ function extractServerMessage(obj) {
 }
 
 /**
+ * `BaseResponse` 스타일 본문에서 표시용 성공 문구 (최상위 `message` 우선, 없으면 `data.message`)
+ * @param {object} b
+ */
+function pickApproveSuccessMessage(b) {
+  if (!b || typeof b !== 'object') return '결제가 완료되었습니다.';
+  const top = extractServerMessage(b);
+  const nested = b.data != null && typeof b.data === 'object' ? b.data : null;
+  const inner = nested ? extractServerMessage(nested) : '';
+  const text = (top || inner).trim();
+  return text || '결제가 완료되었습니다.';
+}
+
+/**
  * @param {unknown} body — JSON body after APIService unwrap (axios response.data)
- * @returns {{ ok: true } | { ok: false, message: string }}
+ * @returns {{ ok: true, message: string, code?: number, data?: unknown } | { ok: false, message: string }}
  */
 export function interpretApproveResponse(body) {
   if (body == null || typeof body !== 'object') {
@@ -24,8 +37,15 @@ export function interpretApproveResponse(body) {
     return { ok: false, message: msg };
   }
 
+  const code = typeof body.code === 'number' ? body.code : undefined;
+
   if (body.success === true) {
-    return { ok: true };
+    return {
+      ok: true,
+      message: pickApproveSuccessMessage(body),
+      ...(code !== undefined ? { code } : {}),
+      data: body.data,
+    };
   }
 
   const nested = body.data != null && typeof body.data === 'object' ? body.data : null;
@@ -36,7 +56,12 @@ export function interpretApproveResponse(body) {
   }
 
   if (nested?.success === true) {
-    return { ok: true };
+    return {
+      ok: true,
+      message: pickApproveSuccessMessage(body),
+      ...(code !== undefined ? { code } : {}),
+      data: nested,
+    };
   }
 
   const hasImplicitOk =
@@ -54,7 +79,12 @@ export function interpretApproveResponse(body) {
         nested.orderId != null));
 
   if (hasImplicitOk) {
-    return { ok: true };
+    return {
+      ok: true,
+      message: pickApproveSuccessMessage(body),
+      ...(code !== undefined ? { code } : {}),
+      data: nested ?? body.data,
+    };
   }
 
   const tentativeMsg = extractServerMessage(body);

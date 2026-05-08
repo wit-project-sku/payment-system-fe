@@ -1,32 +1,78 @@
 .modalWrapper {
   width: 1300px;
   height: 1600px;
-  padding: 60px 50px;
-  background: #ffffff;
+  padding: 56px 50px 60px;
+  background: #fffbf2;
   border-radius: 28px;
   text-align: center;
   font-family: 'NotoSans';
+  box-sizing: border-box;
+  border: 2px solid #e8dfd5;
+  box-shadow: 0 12px 40px rgba(75, 61, 42, 0.12);
+}
+
+.errorHero {
+  margin-bottom: 28px;
+}
+
+.errorCircle {
+  width: 140px;
+  height: 140px;
+  margin: 0 auto;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #c45c4a 0%, #9e3f36 100%);
+  color: #fff8f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 12px 32px rgba(158, 63, 54, 0.35);
+}
+
+.errorMark {
+  width: 64px;
+  height: 64px;
 }
 
 .title {
   font-size: 80px;
   font-weight: 600;
-  color: #4a3a2a;
+  color: #4b3d2a;
   margin-bottom: 20px;
 }
 
 .desc {
   font-size: 45px;
   color: #8b7355;
-  margin-bottom: 70px;
+  margin-bottom: 36px;
+  line-height: 1.35;
+  word-break: keep-all;
+}
+
+.detailCard {
+  width: 1100px;
+  margin: 0 auto 36px;
+  padding: 32px 40px;
+  background: linear-gradient(180deg, #fffdf9 0%, #faf5ef 100%);
+  border: 2px solid #d4a08a;
+  border-radius: 22px;
+  box-sizing: border-box;
+  box-shadow: 0 8px 28px rgba(75, 61, 42, 0.08);
+}
+
+.detailLabel {
+  display: block;
+  font-size: 34px;
+  font-weight: 700;
+  color: #9e3f36;
+  margin-bottom: 16px;
+  text-align: center;
 }
 
 .detail {
   font-size: 38px;
-  color: #6b5344;
-  margin: -40px auto 40px;
-  max-width: 950px;
-  line-height: 1.35;
+  color: #4b3d2a;
+  margin: 0;
+  line-height: 1.4;
   word-break: keep-all;
 }
 
@@ -62,14 +108,15 @@
 .actionButton {
   width: 950px;
   height: 170px;
-  background: #a38a68;
+  background: #8b7355;
   color: white;
   border: none;
-  border-radius: 14px;
+  border-radius: 25px;
   font-size: 60px;
-  font-weight: 500;
+  font-weight: 600;
   margin-top: 30px;
   cursor: pointer;
+  box-shadow: 0 6px 20px rgba(139, 115, 85, 0.35);
 }
 
 .actionButton:hover {

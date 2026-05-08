@@ -83,7 +83,11 @@ export default function PaymentModal({ merchantUid, items, onBack, onTimeout, on
       .then((res) => {
         const outcome = interpretApproveResponse(res);
         if (outcome.ok) {
-          onCompleteRef.current?.();
+          onCompleteRef.current?.({
+            message: outcome.message,
+            ...(outcome.code !== undefined ? { code: outcome.code } : {}),
+            data: outcome.data,
+          });
         } else {
           onFailRef.current?.('payment', outcome.message);
         }

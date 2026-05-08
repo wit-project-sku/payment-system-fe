@@ -4,7 +4,7 @@ import Modal from '@commons/KioskModal';
 import QRCode from 'react-qr-code';
 import { useUserStore } from '@hooks/useUserStore';
 
-export default function PaymentCompleteModal({ onClose }) {
+export default function PaymentCompleteModal({ onClose, summary = null }) {
   const [countdown, setCountdown] = useState(60);
   const phone = useUserStore((state) => state.phone);
 
@@ -66,8 +66,28 @@ export default function PaymentCompleteModal({ onClose }) {
 
   return (
     <Modal onClose={handleClose}>
+      <div className={styles.successHero} aria-hidden='true'>
+        <div className={styles.successCircle}>
+          <svg className={styles.successCheck} viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
+            <path
+              d='M20 6L9 17l-5-5'
+              stroke='currentColor'
+              strokeWidth='2.5'
+              strokeLinecap='round'
+              strokeLinejoin='round'
+            />
+          </svg>
+        </div>
+      </div>
+
       <h2 className={styles.title}>결제 완료</h2>
-      <p className={styles.subtitle}>결제가 정상적으로 처리되었습니다.</p>
+
+      <div className={styles.apiBanner}>
+        <span className={styles.apiBannerLabel}>승인 결과</span>
+        <p className={styles.apiBannerMessage}>{summary?.message ?? '결제가 정상적으로 처리되었습니다.'}</p>
+        {summary?.code != null ? <p className={styles.apiBannerMeta}>응답 코드 {summary.code}</p> : null}
+      </div>
+
       <p className={styles.subtitleFollow}>문자 메시지가 발송되었습니다.</p>
 
       <div className={styles.noticeBox}>

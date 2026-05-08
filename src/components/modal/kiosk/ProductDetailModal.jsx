@@ -16,7 +16,9 @@ export default function ProductDetailModal({ item, onClose, onAdd }) {
   useEffect(() => {
     if (!item?.id) return;
     getProductDetail(item.id)
-      .then((res) => setDetail({ ...res.data, count: 1 }))
+      .then((entity) => {
+        if (entity && typeof entity === 'object') setDetail({ ...entity, count: 1 });
+      })
       .catch((err) => console.error(err));
   }, [item]);
 

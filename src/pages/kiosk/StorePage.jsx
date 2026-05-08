@@ -66,12 +66,8 @@ export default function StorePage() {
 
     const fetchProducts = async () => {
       try {
-        const res = await getProductsByCategory(activeCategory.id, effectiveKioskId);
-        if (res?.data) {
-          setProducts(res.data);
-        } else {
-          setProducts([]);
-        }
+        const list = await getProductsByCategory(activeCategory.id, effectiveKioskId);
+        setProducts(Array.isArray(list) ? list : []);
       } catch (err) {
         console.error('상품 조회 실패:', err);
         setProducts([]);

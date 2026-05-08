@@ -94,7 +94,7 @@ export default function SearchPage() {
           try {
             const res =
               mode === 'order'
-                ? await fetchDeliveryByPhone(cleanedPhone, { order: 'ORDERED' })
+                ? await fetchDeliveryByPhone(cleanedPhone, { keyword: 'ORDERED' })
                 : await fetchDeliveryByPhone(cleanedPhone);
             const data = res?.data ?? [];
 

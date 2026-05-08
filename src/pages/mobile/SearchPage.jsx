@@ -1,21 +1,27 @@
-import { useState } from 'react';
-import { fetchOrderByPhone } from '@api/paymentApi';
+import { useEffect, useMemo, useState } from 'react';
 import { fetchDeliveryByPhone } from '@api/deliveryApi';
 import { useNavigate, useLocation } from 'react-router-dom';
 import styles from './SearchPage.module.css';
 import left from '@assets/images/left.png';
 import telImg from '@assets/images/tel.png';
 import NotFoundModal from '@modals/mobile/NotFoundModal';
+import { extractListPayload } from '@/utils/mobileDelivery';
 
 export default function SearchPage() {
   const [phone, setPhone] = useState('');
-  const [orders, setOrders] = useState([]);
   const [showNotFound, setShowNotFound] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
-  const searchParams = new URLSearchParams(location.search);
+  const searchParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
   const mode = searchParams.get('type');
+
+  useEffect(() => {
+    if (mode !== 'order' && mode !== 'delivery') {
+      navigate('/mobile', { replace: true });
+    }
+  }, [mode, navigate]);
 
   function formatPhone(num) {
     if (!num) return '';
@@ -27,6 +33,77 @@ export default function SearchPage() {
 
   const cleanedPhone = phone.replace(/[^0-9]/g, '');
   const isValid = cleanedPhone.length === 11;
+
+  const fetchByPhone = async () => {
+    const query = mode === 'order' ? { order: 'ORDERED' } : {};
+    const res = await fetchDeliveryByPhone(cleanedPhone, query);
+    return extractListPayload(res);
+  };
+
+  const handleNext = async () => {
+    if (!isValid || mode === null) return;
+
+    setSubmitting(true);
+    setShowNotFound(false);
+
+    try {
+      /** `GET /api/deliveries/search` — order flow sends `order=ORDERED` so the server returns only actionable rows */
+      const rawList = await fetchByPhone();
+
+      if (mode === 'order') {
+        if (!rawList.length) {
+          setShowNotFound(true);
+          return;
+        }
+        localStorage.setItem(
+          'user-phone',
+          JSON.stringify({
+            state: { phone: cleanedPhone },
+            version: 0,
+          }),
+        );
+        navigate('/mobile/option', {
+          state: {
+            orders: rawList,
+            phoneNumber: cleanedPhone,
+            fromOption: true,
+            deliveryId: rawList[0].deliveryId,
+          },
+        });
+        return;
+      }
+
+      if (!rawList.length) {
+        setShowNotFound(true);
+        return;
+      }
+
+      localStorage.setItem(
+        'user-phone',
+        JSON.stringify({
+          state: { phone: cleanedPhone },
+          version: 0,
+        }),
+      );
+
+      navigate('/mobile/delivery', {
+        state: {
+          orders: rawList,
+          phoneNumber: cleanedPhone,
+        },
+      });
+    } catch (e) {
+      console.error('조회 실패:', e);
+      const status = e?.response?.status;
+      if (status === 404) {
+        setShowNotFound(true);
+      } else {
+        alert('조회에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <div className={styles.container}>
@@ -61,78 +138,12 @@ export default function SearchPage() {
         </div>
       </div>
 
-      {orders.length > 0 && (
-        <div className={styles.resultBox}>
-          {orders.map((order) => (
-            <div key={mode === 'order' ? order.paymentId : order.deliveryId} className={styles.resultItem}>
-              {mode === 'order' ? (
-                <>
-                  <div className={styles.resultAddress}>{order.deliveryAddress}</div>
-                  {order.items.map((it, idx) => (
-                    <div key={idx} className={styles.resultProduct}>
-                      상품번호: {it.productId} / 옵션: {it.optionText}
-                    </div>
-                  ))}
-                </>
-              ) : (
-                <>
-                  <div className={styles.resultAddress}>주문번호: {order.transactionId}</div>
-                  {order.productListResponses.map((it, idx) => (
-                    <div key={idx} className={styles.resultProduct}>
-                      상품명: {it.productName} / 수량: {it.productQuantity}
-                    </div>
-                  ))}
-                </>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
-
       <button
-        className={`${styles.nextButton} ${isValid ? styles.active : ''}`}
-        disabled={!isValid}
-        onClick={async () => {
-          if (!isValid) return;
-
-          localStorage.setItem(
-            'user-phone',
-            JSON.stringify({
-              state: { phone: cleanedPhone },
-              version: 0,
-            }),
-          );
-
-          try {
-            const res =
-              mode === 'order' ? await fetchOrderByPhone(cleanedPhone) : await fetchDeliveryByPhone(cleanedPhone);
-            const data = res?.data ?? [];
-
-            setOrders(data);
-
-            if (Array.isArray(data) && data.length > 0) {
-              const target = mode === 'order' ? '/mobile/option' : '/mobile/delivery';
-              navigate(target, {
-                state: {
-                  orders: data,
-                  phoneNumber: cleanedPhone,
-                  fromOption: true,
-                  deliveryId: data?.[0]?.deliveryId,
-                },
-              });
-            } else {
-              setShowNotFound(true);
-            }
-          } catch (e) {
-            console.error('조회 실패:', e);
-            const status = e?.response?.status;
-            if (status === 404) {
-              setShowNotFound(true);
-            }
-          }
-        }}
+        className={`${styles.nextButton} ${isValid && !submitting ? styles.active : ''}`}
+        disabled={!isValid || submitting || mode === null}
+        onClick={handleNext}
       >
-        다음
+        {submitting ? '조회 중...' : '다음'}
       </button>
       {showNotFound && <NotFoundModal onClose={() => setShowNotFound(false)} />}
     </div>

@@ -60,11 +60,7 @@ export default function AppRouter() {
     },
     {
       path: 'delivery',
-      element: (
-        <AddressGuard>
-          <DeliveryPage />
-        </AddressGuard>
-      ),
+      element: <DeliveryPage />,
     },
     { path: 'refund', element: <RefundPage /> },
     { path: '*', element: <NotFoundPage /> },

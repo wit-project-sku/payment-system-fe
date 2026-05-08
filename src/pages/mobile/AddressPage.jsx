@@ -10,10 +10,17 @@ import { saveDeliveryOptions } from '@api/deliveryApi';
 export default function AddressPage() {
   const navigate = useNavigate();
   const { state } = useLocation();
-  const deliveryId = state?.deliveryId ?? state?.orders?.[0]?.deliveryId;
-  console.log('AddressPage state:', state);
-  console.log('deliveryId:', deliveryId);
+  const orders = state?.orders ?? [];
+  const selectedOptions = state?.selectedOptions ?? {};
+  const optionLineRows = state?.optionLineRows ?? [];
 
+  const deliveryIds = [
+    ...new Set(
+      optionLineRows.length
+        ? optionLineRows.map((r) => r.deliveryId)
+        : orders.map((o) => o.deliveryId).filter(Boolean),
+    ),
+  ].filter(Boolean);
   const [form, setForm] = useState({
     name: '',
     zipcode: '',
@@ -67,27 +74,45 @@ export default function AddressPage() {
     });
   };
 
+  const buildProductOptionRequests = (deliveryId) =>
+    optionLineRows
+      .filter((row) => row.deliveryId === deliveryId && row.category === '폰케이스')
+      .map((row) => {
+        const option = selectedOptions[row.id];
+        if (!option) return null;
+        return { productId: row.productId, option };
+      })
+      .filter(Boolean);
+
   const handleSubmit = async () => {
     if (!allAgreed) return;
 
-    if (!deliveryId) {
+    if (!deliveryIds.length) {
       alert('배송 정보가 없습니다.');
       return;
     }
 
     try {
-      await saveDeliveryOptions(deliveryId, {
-        productOptionRequests: [],
+      const payload = {
         receiverName: form.name,
         zipCode: form.zipcode,
         address: form.address,
         detailAddress: form.detail,
-      });
+      };
+
+      for (const id of deliveryIds) {
+        await saveDeliveryOptions(id, {
+          ...payload,
+          productOptionRequests: buildProductOptionRequests(id),
+        });
+      }
 
       alert('주문이 완료되었습니다.');
       navigate('/mobile');
     } catch (error) {
-      alert('주문 처리 중 오류가 발생했습니다.', error);
+      const msg =
+        error?.response?.data?.message || error?.message || '주문 처리 중 오류가 발생했습니다.';
+      alert(msg);
     }
   };
 

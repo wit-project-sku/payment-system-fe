@@ -1,10 +1,17 @@
 import { APIService } from './axios';
 
-export const fetchDeliveryByPhone = async (phoneNumber) => {
+/**
+ * Public delivery lookup by phone (`GET /api/deliveries/search`).
+ * @param {string} phoneNumber
+ * @param {{ order?: string }} [query] — optional `order`: delivery status filter (`ORDERED`, etc.) for mobile order-completion flow
+ */
+export const fetchDeliveryByPhone = async (phoneNumber, query = {}) => {
   try {
-    const res = await APIService.public.get('/deliveries/search', {
-      params: { phoneNumber },
-    });
+    const params = { phoneNumber };
+    if (query.order != null && String(query.order).trim() !== '') {
+      params.order = String(query.order).trim();
+    }
+    const res = await APIService.public.get('/deliveries/search', { params });
     return res;
   } catch (err) {
     console.error('주문 조회 실패:', err);

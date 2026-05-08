@@ -60,6 +60,10 @@ export const approvePayment = (payload) => {
   return APIService.local.post(PAYMENTS_APPROVE_PATH, body);
 };
 
+/**
+ * 모바일 등 공개 클라이언트에서는 `SecurityConfig` 에 허용된 `/api/deliveries/search` 사용을 권장합니다.
+ * 이 엔드포인트가 게이트에 노출되면 다시 사용할 수 있습니다.
+ */
 export const fetchOrderByPhone = async (phoneNumber) => {
   try {
     const res = await APIService.public.get('/payments/search', {

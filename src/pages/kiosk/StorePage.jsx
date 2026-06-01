@@ -1,6 +1,6 @@
 import GoodsItem from '@components/goods/GoodsItem';
 import styles from './StorePage.module.css';
-import { useOutletContext, useSearchParams, useNavigate } from 'react-router-dom';
+import { useOutletContext, useSearchParams, useNavigate, useLocation } from 'react-router-dom';
 
 import { useState, useEffect, useRef } from 'react';
 import ProductDetailModal from '@components/modal/kiosk/ProductDetailModal';
@@ -15,6 +15,7 @@ export default function StorePage() {
 
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const justNormalizedRef = useRef(false);
 
   /** URL 정규화 이후 localStorage 기준 — 렌더 시점 값과 어긋나 빈 목록이 나오지 않게 요청 직전에 읽습니다. */
@@ -27,7 +28,9 @@ export default function StorePage() {
   };
 
   useEffect(() => {
-    const rawSearch = window.location.search ?? '';
+    const routerQuery = searchParams.toString();
+    const rawSearch =
+      window.location.search || (routerQuery ? `?${routerQuery}` : '');
 
     if (!rawSearch) {
       if (justNormalizedRef.current) {
@@ -51,7 +54,7 @@ export default function StorePage() {
     const fixedParams = new URLSearchParams(fixedSearch);
     const imageUrl = fixedParams.get('imageUrl');
     const rawFromQuery = fixedParams.get('kioskId') ?? fixedParams.get('kiosk-id');
-    const path = window.location.pathname ?? '';
+    const path = location.pathname ?? '';
     const rawFromPath = path.match(/kiosk-id(\d+)/)?.[1] ?? path.match(/kioskId(\d+)/)?.[1] ?? null;
     const raw = rawFromQuery ?? rawFromPath;
     const digits = raw ? String(raw).match(/\d+/)?.[0] : null;
@@ -62,7 +65,7 @@ export default function StorePage() {
     justNormalizedRef.current = true;
     sessionStorage.setItem('kiosk-normalized', '1');
     navigate('/kiosk/store', { replace: true });
-  }, [searchParams, navigate]);
+  }, [searchParams, navigate, location.pathname]);
 
   useEffect(() => {
     if (!categories || !categories.length) return;

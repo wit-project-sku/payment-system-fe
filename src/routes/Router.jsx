@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
 import KioskLayout from '@layouts/KioskLayout';
 import MobileLayout from '@layouts/MobileLayout';

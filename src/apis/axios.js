@@ -87,7 +87,7 @@ const onRefreshed = (newToken) => {
 const forceLogout = () => {
   localStorage.removeItem('accessToken');
   localStorage.removeItem('refreshToken');
-  window.location.href = '/admin/login';
+  window.location.hash = '#/mobile';
 };
 
 /**

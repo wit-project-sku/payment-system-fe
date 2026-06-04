@@ -31,6 +31,65 @@
   cursor: pointer;
 }
 
+@media (max-width: 1280px) {
+  .card {
+    width: 350px;
+    height: 560px;
+    padding: 25px 25px 0px;
+    margin-top: 30px;
+  }
+
+  .thumbnail {
+    width: 300px;
+    height: 300px;
+    padding: 20px 16px;
+  }
+
+  .name {
+    font-size: 24px;
+  }
+
+  .desc {
+    font-size: 18px;
+    line-height: 24px;
+  }
+
+  .price {
+    font-size: 32px;
+  }
+}
+
+@media (max-width: 768px) {
+  .card {
+    width: 100%;
+    max-width: 440px;
+    height: auto;
+    padding: 20px 20px 0px;
+    margin-top: 20px;
+  }
+
+  .thumbnail {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+    padding: 20px 16px;
+  }
+
+  .name {
+    font-size: 20px;
+    margin-top: 8px;
+  }
+
+  .desc {
+    font-size: 16px;
+    line-height: 20px;
+  }
+
+  .price {
+    font-size: 28px;
+  }
+}
+
 .name {
   margin-top: 10px;
   font-size: 32px;

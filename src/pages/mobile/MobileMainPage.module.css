@@ -44,6 +44,60 @@
   font-family: 'NotoSans';
 }
 
+@media (min-width: 768px) {
+  .mainButton {
+    width: 600px;
+    height: 140px;
+    border-radius: 20px;
+    padding: 0 40px;
+    margin-bottom: 25px;
+  }
+
+  .buttonTitle {
+    font-size: 28px;
+  }
+
+  .buttonDesc {
+    font-size: 18px;
+  }
+
+  .buttonIconCircle {
+    width: 80px;
+    height: 80px;
+    margin-right: 30px;
+  }
+
+  .buttonIcon {
+    width: 45px;
+    height: 45px;
+  }
+
+  .title {
+    font-size: 42px;
+    margin-bottom: 12px;
+  }
+
+  .subtitle {
+    font-size: 24px;
+  }
+
+  .noticeBox {
+    width: 100%;
+    height: auto;
+    padding: 25px 30px;
+    border-radius: 20px;
+    margin-top: 25px;
+  }
+
+  .noticeTitle {
+    font-size: 16px;
+  }
+
+  .noticeText {
+    font-size: 16px;
+  }
+}
+
 .orderButton {
   background: #d4a574;
 }

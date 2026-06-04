@@ -124,3 +124,53 @@
   background: #d4a574;
   color: #ffffff;
 }
+
+@media (min-width: 1820px) {
+  .title {
+    font-size: 90px !important;
+    margin-top: 60px !important;
+  }
+
+  .subtitle {
+    font-size: 70px !important;
+    margin-bottom: 60px !important;
+  }
+
+  .card {
+    padding: 32px !important;
+    margin-bottom: 60px !important;
+    border-radius: 35px !important;
+  }
+
+  .thumbnail {
+    width: 200px !important;
+    height: 200px !important;
+    border-radius: 20px !important;
+  }
+
+  .name {
+    font-size: 60px !important;
+    margin-bottom: 16px !important;
+  }
+
+  .qty {
+    font-size: 44px !important;
+  }
+
+  .select {
+    margin-top: 28px !important;
+    padding: 20px !important;
+    border-radius: 20px !important;
+    font-size: 52px !important;
+    background-size: 35px !important;
+    background-position: right 25px center !important;
+  }
+
+  .nextButton {
+    padding: 32px 0 !important;
+    border-radius: 25px !important;
+    font-size: 68px !important;
+    margin-bottom: 100px !important;
+  }
+}
+

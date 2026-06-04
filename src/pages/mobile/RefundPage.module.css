@@ -525,3 +525,153 @@
 .successHomeBtn:hover {
   background: #9c7849;
 }
+
+
+@media (min-width: 1820px) {
+  .container {
+    padding: 80px 60px;
+  }
+
+  .title {
+    font-size: 90px !important;
+    margin-bottom: 30px;
+  }
+
+  .subtitle {
+    font-size: 70px !important;
+  }
+
+  .importantBox {
+    padding: 35px 45px;
+    margin-bottom: 45px;
+    border-radius: 25px;
+  }
+
+  .importantTitle {
+    font-size: 52px !important;
+    margin-bottom: 20px !important;
+  }
+
+  .importantText {
+    font-size: 44px !important;
+  }
+
+  .policyButton {
+    height: 100px !important;
+    border-radius: 22px !important;
+    font-size: 52px !important;
+  }
+
+  .fieldLabel {
+    font-size: 48px !important;
+  }
+
+  .input,
+  .select {
+    height: 100px !important;
+    border-bottom: 4px solid #e8dfd3 !important;
+    margin-top: 20px !important;
+    font-size: 52px !important;
+  }
+
+  .textarea {
+    min-height: 260px !important;
+    border-radius: 20px !important;
+    padding: 32px !important;
+    margin-top: 40px !important;
+    font-size: 44px !important;
+  }
+
+  .uploadBox {
+    min-height: 280px !important;
+    border-radius: 22px !important;
+  }
+
+  .previewImage,
+  .previewItem {
+    width: 200px !important;
+    height: 200px !important;
+    border-radius: 16px !important;
+  }
+
+  .uploadIcon {
+    width: 100px !important;
+    height: 100px !important;
+    font-size: 64px !important;
+    margin-bottom: 16px !important;
+  }
+
+  .uploadText {
+    font-size: 44px !important;
+  }
+
+  .uploadSubText {
+    font-size: 36px !important;
+  }
+
+  .submitButton {
+    height: 110px !important;
+    border-radius: 25px !important;
+    margin-top: 60px !important;
+    font-size: 60px !important;
+  }
+
+  .successTitle {
+    font-size: 60px !important;
+  }
+
+  .successMessage {
+    font-size: 48px !important;
+  }
+
+  .successHomeBtn {
+    height: 130px !important;
+    border-radius: 22px !important;
+    font-size: 60px !important;
+  }
+
+  .infoBox {
+    margin-top: 40px !important;
+    padding: 25px 30px !important;
+    border-radius: 20px !important;
+    border: 2px solid #e4decf !important;
+  }
+
+  .infoTitle {
+    font-size: 40px !important;
+    font-weight: 500 !important;
+    color: #5d4e37 !important;
+    margin-bottom: 12px !important;
+  }
+
+  .infoList li {
+    font-size: 36px !important;
+    color: #6a6257 !important;
+    line-height: 2 !important;
+    margin-bottom: 8px !important;
+  }
+
+  .footer {
+    margin-top: 40px !important;
+    padding: 30px !important;
+    border-radius: 20px !important;
+    border: 2px solid #e4decf !important;
+    background: #fffdf9 !important;
+    font-size: 32px !important;
+    color: #8b7355 !important;
+    text-align: center !important;
+  }
+
+  .footerQuestion {
+    font-weight: 600 !important;
+    margin-bottom: 12px !important;
+    color: #5d4e37 !important;
+    font-size: 36px !important;
+  }
+
+  .footerLine {
+    line-height: 1.8 !important;
+    font-size: 32px !important;
+  }
+}
+

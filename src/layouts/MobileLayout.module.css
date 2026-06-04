@@ -2,7 +2,8 @@
   width: 100%;
   max-width: 480px;
   background: #fffbf2;
-  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   margin: 0 auto;
   padding: 30px 20px;
   box-sizing: border-box;

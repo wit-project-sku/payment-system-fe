@@ -2,7 +2,15 @@ import axios from 'axios';
 
 // 공통 설정 상수
 const PUBLIC_API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-const LOCAL_API_BASE_URL = import.meta.env.VITE_API_LOCAL_URL || PUBLIC_API_BASE_URL;
+// localApi = the on-kiosk payment agent (TL-3800 loopback). Prefer the explicit
+// VITE_PAYMENT_API_BASE_URL (=http://127.0.0.1:8080) so store card approvals
+// (POST /api/payments) reach the physical terminal on the kiosk PC, not the
+// remote server (which can't drive a USB terminal). Falls back to the public
+// base only when neither local var is set.
+const LOCAL_API_BASE_URL =
+  import.meta.env.VITE_API_LOCAL_URL ||
+  import.meta.env.VITE_PAYMENT_API_BASE_URL ||
+  PUBLIC_API_BASE_URL;
 const PRIVATE_API_BASE_URL = import.meta.env.VITE_APP_API_URL || PUBLIC_API_BASE_URL;
 const REQUEST_TIMEOUT = 30000;
 const REFRESH_ENDPOINT = '/auths/refresh';
